@@ -1,0 +1,20 @@
+#ifndef __MQTT_H__
+#define __MQTT_H__
+#include <ArduinoJson.h>
+#include <PubSubClient.h>
+
+extern const char* mqtt_server;
+extern const char* espresso_hello_topic;
+extern const char* espresso_command_topic_prefix;
+extern const char* espresso_command_topic_suffix;
+// = "/espresso/hello";
+
+void publishJsonObject(PubSubClient, const char*, const JsonObject&);
+
+void publishString(PubSubClient,const char*,const char*);
+
+void reconnect(PubSubClient);
+
+void mqttLoop(PubSubClient);
+
+#endif
