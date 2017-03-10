@@ -9,7 +9,7 @@ const char* ACTION_BLINK = "BLINK";
 //
 // Command should be in format <number_of_blink>;<delay_time>;
 //
-void processBlinkAction(String command) {  
+void processBlinkAction(String command) {
   int fsc = command.indexOf(";");
   int numberOfBlink = atoi(command.substring(0, fsc).c_str());
   int delayTime = atoi(command.substring(fsc+1, command.length() - 1).c_str());
@@ -33,10 +33,12 @@ void processMessage(String msg) {
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
- Serial.print("Message arrived [");
- Serial.print(topic);
- Serial.println("]");
- processMessage(String((char*)payload));
+  Serial.printf("Free heap: %d\n", ESP.getFreeHeap());
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.println("]");
+  processMessage(String((char*)payload));
+  Serial.printf("Free heap: %d\n", ESP.getFreeHeap());
 }
 
 #endif

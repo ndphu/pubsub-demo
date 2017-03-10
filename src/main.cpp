@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include "MQTT.h"
-#include "Secret.h" // define ssid and password 
+#include "Secret.h" // define ssid and password
 #include "Device.h"
 
 // WiFiClient
@@ -38,10 +38,10 @@ void setup() {
   Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
   setup_wifi();
-  client.setServer(mqtt_server, 1883);
+  setupMQTT(&client);
   client.setCallback(callback);
 }
 
 void loop() {
-  mqttLoop(client);
+  mqttLoop(&client);
 }
