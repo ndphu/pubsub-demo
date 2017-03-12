@@ -3,8 +3,8 @@
 #include "MQTT.h"
 #include "Secret.h" // define ssid and password
 #include "Device.h"
+#include "Display.h"
 
-// WiFiClient
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -40,8 +40,10 @@ void setup() {
   setup_wifi();
   setupMQTT(&client);
   client.setCallback(callback);
+  displaySetup();
 }
 
 void loop() {
   mqttLoop(&client);
+  displayLoop();
 }

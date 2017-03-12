@@ -10,8 +10,8 @@
 const char* mqtt_server = "19november.freeddns.org";
 const int mqtt_port = 5370;
 const char* espresso_hello_topic = "/espresso/device/hello";
-const char* espresso_command_topic_prefix = "/espresso/device/";
-const char* espresso_command_topic_suffix = "/command";
+const char* espresso_command_topic_prefix = "/espresso/devices/";
+const char* espresso_command_topic_suffix = "/commands";
 
 void setupMQTT(PubSubClient* client) {
   Serial.printf("Using broker %s:%d\n", mqtt_server, mqtt_port);
