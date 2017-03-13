@@ -9,9 +9,11 @@
 
 const char* mqtt_server = "19november.freeddns.org";
 const int mqtt_port = 5370;
-const char* espresso_hello_topic = "/espresso/device/hello";
-const char* espresso_command_topic_prefix = "/espresso/devices/";
+const char* espresso_hello_topic = "/espresso/devices/hello";
+const char* espresso_command_topic_prefix = "/espresso/device/";
 const char* espresso_command_topic_suffix = "/commands";
+const char* espresso_health_topic_prefix = "/espresso/device/";
+const char* espresso_health_topic_suffix = "/health";
 
 void setupMQTT(PubSubClient* client) {
   Serial.printf("Using broker %s:%d\n", mqtt_server, mqtt_port);
@@ -31,6 +33,13 @@ void publishString(PubSubClient* client, const char*topic, const char* message) 
   if (client->connected()) {
     client->publish(topic, message);
   }
+}
+
+void publishHealthMessage(PubSubClient* client) {
+  String healthTopic = String(espresso_health_topic_prefix) + ESP.getChipId() + String(espresso_health_topic_suffix);
+  char buffer[50];
+  sprintf(buffer, "{\"serial\":\"%d\",\"free\":%d, \"uptime\": %d}", ESP.getChipId(), ESP.getFreeHeap(), millis());
+  publishString(client, healthTopic.c_str(), buffer);
 }
 
 // private method

@@ -5,6 +5,7 @@
 #include "Device.h"
 #include "Display.h"
 
+
 const int ledPin = 2;
 
 const char* ACTION_BLINK = "BLINK";
@@ -12,7 +13,7 @@ const char* ACTION_GPIO_WRITE = "GPIO_WRITE";
 const char* ACTION_DISPLAY_TEXT = "DISPLAY_TEXT";
 
 
-String getPart(String data, int partIndex) {
+String getCommandPart(String data, int partIndex) {
   int c = 0;
   int begin = 0;
   int end = 0;
@@ -36,8 +37,8 @@ String getPart(String data, int partIndex) {
 // Command should be in format <number_of_blink>;<delay_time>;
 //
 void processBlinkAction(String command) {
-  int numberOfBlink = atoi(getPart(command, 1).c_str());
-  int delayTime = atoi(getPart(command, 2).c_str());
+  int numberOfBlink = atoi(getCommandPart(command, 1).c_str());
+  int delayTime = atoi(getCommandPart(command, 2).c_str());
   Serial.printf("Blink %d times with delay %d ms\n", numberOfBlink, delayTime);
   for (int i = 0; i < numberOfBlink; ++i) {
     digitalWrite(ledPin, HIGH);
@@ -50,8 +51,8 @@ void processBlinkAction(String command) {
 // GPIO WRITE
 void processGpioWrite(String command) {
   int fsc = command.indexOf(";");
-  int pin = atoi(getPart(command, 1).c_str());
-  int state = atoi(getPart(command, 2).c_str());
+  int pin = atoi(getCommandPart(command, 1).c_str());
+  int state = atoi(getCommandPart(command, 2).c_str());
   if (state == 0 || state == 1) {
     Serial.printf("Set pin %d to %d\n", pin, state);
     pinMode(pin, OUTPUT);
@@ -63,9 +64,9 @@ void processGpioWrite(String command) {
 
 // DISPLAY_TEXT
 void processDisplayText(String command) {
-  setFontSize(atoi(getPart(command, 1).c_str()));
-  setTextAlignment(atoi(getPart(command, 2).c_str()));  
-  setDisplayText(getPart(command, 3));
+  setFontSize(atoi(getCommandPart(command, 1).c_str()));
+  setTextAlignment(atoi(getCommandPart(command, 2).c_str()));
+  setDisplayText(getCommandPart(command, 3));
 }
 // end DISPLAY_TEXT
 
@@ -74,7 +75,7 @@ void processMessage(String msg) {
   int fsc = msg.indexOf(";");
   // String action = msg.substring(0, fsc);
   // String command = msg.substring(fsc + 1);
-  String action = getPart(msg, 0);
+  String action = getCommandPart(msg, 0);
   if (action  == ACTION_BLINK) {
     processBlinkAction(msg);
   } else if (action  == ACTION_GPIO_WRITE) {

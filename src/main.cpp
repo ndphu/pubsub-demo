@@ -4,12 +4,22 @@
 #include "Secret.h" // define ssid and password
 #include "Device.h"
 #include "Display.h"
+#include <Ticker.h>
 
-
+// Wifi client
 WiFiClient espClient;
 PubSubClient client(espClient);
-
 // End WifiClient
+
+// Health reporter Ticker
+const int healthReportInterval = 60; // 1 min for each health report
+Ticker healthReporter;
+bool healthReportRequested = true;
+void reportHealth() {
+  //publishString(&client, );
+  healthReportRequested = true;
+}
+// End reporter
 
 // Define Pins
 int ledPin = 2;
@@ -41,9 +51,15 @@ void setup() {
   setupMQTT(&client);
   client.setCallback(callback);
   displaySetup();
+  healthReporter.attach(healthReportInterval, reportHealth);
 }
 
 void loop() {
   mqttLoop(&client);
+  if (healthReportRequested) {
+    publishHealthMessage(&client);
+    healthReportRequested = false;
+  }
   displayLoop();
+
 }
