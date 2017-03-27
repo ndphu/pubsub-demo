@@ -9,11 +9,11 @@
 
 const char* mqtt_server = "19november.freeddns.org";
 const int mqtt_port = 5370;
-const char* espresso_hello_topic = "/espresso/devices/hello";
-const char* espresso_command_topic_prefix = "/espresso/device/";
+
+const char* espresso_command_topic_prefix = "/esp/device/";
 const char* espresso_command_topic_suffix = "/commands";
-const char* espresso_health_topic_prefix = "/espresso/device/";
-const char* espresso_health_topic_suffix = "/health";
+
+const char* healthTopic = "/esp/devices/health";
 
 void setupMQTT(PubSubClient* client) {
   Serial.printf("Using broker %s:%d\n", mqtt_server, mqtt_port);
@@ -36,10 +36,9 @@ void publishString(PubSubClient* client, const char*topic, const char* message) 
 }
 
 void publishHealthMessage(PubSubClient* client) {
-  String healthTopic = String(espresso_health_topic_prefix) + ESP.getChipId() + String(espresso_health_topic_suffix);
   char buffer[50];
   sprintf(buffer, "{\"serial\":\"%d\",\"free\":%d, \"uptime\": %d}", ESP.getChipId(), ESP.getFreeHeap(), millis());
-  publishString(client, healthTopic.c_str(), buffer);
+  publishString(client, healthTopic, buffer);
 }
 
 // private method
@@ -50,8 +49,7 @@ void reconnect(PubSubClient* client) {
     String clientId = "ESP8266Client-" + chipId + "-";
     String commmandTopic = String(espresso_command_topic_prefix) + chipId + String(espresso_command_topic_suffix);
     clientId += String(random(0xffff), HEX);
-    if (client->connect(clientId.c_str())) {
-      publishString(client, espresso_hello_topic, chipId.c_str());
+    if (client->connect(clientId.c_str())) {      
       Serial.printf("Subscribe to command topic at %s\n", commmandTopic.c_str());
       client->subscribe(commmandTopic.c_str(), 1);
     } else {

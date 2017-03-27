@@ -1,4 +1,8 @@
-// const char* ssid     = "KMS-Guest";
-// const char* password = "0nlyG11est#2017";
-const char* ssid     = "Neverland";
-const char* password = "November";
+#ifndef __SECRET_H__
+#define __SECRET_H__
+
+extern const char* ssid;
+extern const char* password;
+
+
+#endif
