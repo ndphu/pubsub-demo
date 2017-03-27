@@ -35,24 +35,27 @@ void setup_wifi() {
     delay(500);
     Serial.print(".");
   }
-  randomSeed(micros());
 
   Serial.println("");
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
+  setupMQTT(&client);
+  client.setCallback(callback);
 }
 
 void setup() {
   Serial.begin(115200);
+  randomSeed(micros());
   pinMode(ledPin, OUTPUT);
   setup_wifi();
-  setupMQTT(&client);
-  client.setCallback(callback);
   healthReporter.attach(healthReportInterval, reportHealth);
 }
 
 void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    setup_wifi();
+  }
   mqttLoop(&client);
 
   if (isHealthReportRequested()) {

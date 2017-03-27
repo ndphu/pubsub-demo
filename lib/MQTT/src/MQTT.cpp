@@ -1,6 +1,7 @@
 #ifndef __MQTT_H__
 #define __MQTT_H__
 
+#include <ESP8266WiFi.h>
 #include "MQTT.h"
 #include "PubSubClient.h"
 #include "ArduinoJson.h"
@@ -43,30 +44,31 @@ void publishHealthMessage(PubSubClient* client) {
 
 // private method
 void reconnect(PubSubClient* client) {
-  while (!client->connected()) {
+  while (WiFi.status() == WL_CONNECTED && !client->connected()) {
     Serial.print("Attempting MQTT connection...");
     String chipId = String(ESP.getChipId());
     String clientId = "ESP8266Client-" + chipId + "-";
     String commmandTopic = String(espresso_command_topic_prefix) + chipId + String(espresso_command_topic_suffix);
     clientId += String(random(0xffff), HEX);
-    if (client->connect(clientId.c_str())) {      
+    if (client->connect(clientId.c_str())) {
       Serial.printf("Subscribe to command topic at %s\n", commmandTopic.c_str());
       client->subscribe(commmandTopic.c_str(), 1);
     } else {
       Serial.print("failed, rc=");
       Serial.print(client->state());
       Serial.println(" try again in 5 seconds");
-      delay(5000);
     }
   }
 }
 // end
 
 void mqttLoop(PubSubClient* client) {
-  if (!client->connected()) {
-    reconnect(client);
+  if (WiFi.status() == WL_CONNECTED) {
+    if (!client->connected()) {
+      reconnect(client);
+    }
+    client->loop();
   }
-  client->loop();
 }
 
 #endif
