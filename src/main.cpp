@@ -3,7 +3,11 @@
 #include "MQTT.h"
 #include "Secret.h" // define ssid and password
 #include "Device.h"
+
+#ifdef __ESP_V12__
 #include "Display.h"
+#endif
+
 #include <Ticker.h>
 
 // Wifi client
@@ -50,16 +54,23 @@ void setup() {
   setup_wifi();
   setupMQTT(&client);
   client.setCallback(callback);
+  #ifdef __ESP_V12__
   displaySetup();
+  #endif
   healthReporter.attach(healthReportInterval, reportHealth);
 }
 
 void loop() {
   mqttLoop(&client);
+  if (isHealthReportRequested()) {
+    publishHealthMessage(&client);
+    setHealthReportRequested(false);
+  }
   if (healthReportRequested) {
     publishHealthMessage(&client);
     healthReportRequested = false;
   }
+  #ifdef __ESP_V12__
   displayLoop();
-
+  #endif
 }

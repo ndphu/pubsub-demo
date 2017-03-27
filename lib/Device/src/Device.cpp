@@ -3,14 +3,18 @@
 
 #include  <ESP8266WiFi.h>
 #include "Device.h"
+#ifdef __ESP_V12__
 #include "Display.h"
+#endif
 
+bool healthReportRequestedFromServer = false;
 
 const int ledPin = 2;
 
 const char* ACTION_BLINK = "BLINK";
 const char* ACTION_GPIO_WRITE = "GPIO_WRITE";
 const char* ACTION_DISPLAY_TEXT = "DISPLAY_TEXT";
+const char* ACTION_PING = "PING";
 
 
 String getCommandPart(String data, int partIndex) {
@@ -64,11 +68,32 @@ void processGpioWrite(String command) {
 
 // DISPLAY_TEXT
 void processDisplayText(String command) {
+  #ifdef __ESP_V12__
   setFontSize(atoi(getCommandPart(command, 1).c_str()));
   setTextAlignment(atoi(getCommandPart(command, 2).c_str()));
   setDisplayText(getCommandPart(command, 3));
+  #endif
 }
 // end DISPLAY_TEXT
+
+// PING
+
+void processPing() {
+  //publishHealthMessage();
+  Serial.println("Set health request to true");
+  healthReportRequestedFromServer = true;
+}
+
+bool isHealthReportRequested() {
+  return healthReportRequestedFromServer;
+}
+
+void setHealthReportRequested(bool value) {
+  healthReportRequestedFromServer = value;
+}
+
+// end PING
+
 
 void processMessage(String msg) {
   Serial.printf("Process message [%s]\n", msg.c_str());
@@ -82,6 +107,8 @@ void processMessage(String msg) {
     processGpioWrite(msg);
   } else if (action == ACTION_DISPLAY_TEXT) {
     processDisplayText(msg);
+  } else if (action == ACTION_PING) {
+    processPing();
   }
 }
 
