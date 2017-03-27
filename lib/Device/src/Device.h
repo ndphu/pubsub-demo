@@ -6,4 +6,8 @@ void callback(char* topic, byte* payload, unsigned int length);
 
 void processMessage(String msg);
 
+bool isHealthReportRequested();
+
+void setHealthReportRequested(bool value);
+
 #endif

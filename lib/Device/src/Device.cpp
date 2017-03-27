@@ -3,15 +3,14 @@
 
 #include  <ESP8266WiFi.h>
 #include "Device.h"
-#include "Display.h"
-
 
 const int ledPin = 2;
 
-const char* ACTION_BLINK = "BLINK";
-const char* ACTION_GPIO_WRITE = "GPIO_WRITE";
-const char* ACTION_DISPLAY_TEXT = "DISPLAY_TEXT";
+const char* ACTION_BLINK = "BLINK;";
+const char* ACTION_GPIO_WRITE = "GPIO_WRITE;";
+const char* ACTION_PING = "PING;";
 
+bool pingRequested = false;
 
 String getCommandPart(String data, int partIndex) {
   int c = 0;
@@ -62,26 +61,32 @@ void processGpioWrite(String command) {
 
 // End GPIO WRITE
 
-// DISPLAY_TEXT
-void processDisplayText(String command) {
-  setFontSize(atoi(getCommandPart(command, 1).c_str()));
-  setTextAlignment(atoi(getCommandPart(command, 2).c_str()));
-  setDisplayText(getCommandPart(command, 3));
+
+// PING
+
+bool isHealthReportRequested() {
+  return pingRequested;
 }
-// end DISPLAY_TEXT
+
+void setHealthReportRequested(bool value) {
+  pingRequested = value;
+}
+
+
+void processPing() {
+  setHealthReportRequested(true);
+}
+
+// End PING
 
 void processMessage(String msg) {
   Serial.printf("Process message [%s]\n", msg.c_str());
-  int fsc = msg.indexOf(";");
-  // String action = msg.substring(0, fsc);
-  // String command = msg.substring(fsc + 1);
-  String action = getCommandPart(msg, 0);
-  if (action  == ACTION_BLINK) {
+  if (msg.indexOf(ACTION_BLINK) == 0) {
     processBlinkAction(msg);
-  } else if (action  == ACTION_GPIO_WRITE) {
+  } else if (msg.indexOf(ACTION_GPIO_WRITE) == 0) {
     processGpioWrite(msg);
-  } else if (action == ACTION_DISPLAY_TEXT) {
-    processDisplayText(msg);
+  } else if (msg.indexOf(ACTION_PING) == 0) {
+    processPing();
   }
 }
 

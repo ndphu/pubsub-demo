@@ -3,7 +3,6 @@
 #include "MQTT.h"
 #include "Secret.h" // define ssid and password
 #include "Device.h"
-#include "Display.h"
 #include <Ticker.h>
 
 // Wifi client
@@ -50,16 +49,19 @@ void setup() {
   setup_wifi();
   setupMQTT(&client);
   client.setCallback(callback);
-  displaySetup();
   healthReporter.attach(healthReportInterval, reportHealth);
 }
 
 void loop() {
   mqttLoop(&client);
+
+  if (isHealthReportRequested()) {
+    publishHealthMessage(&client);
+    setHealthReportRequested(false);
+  }
+
   if (healthReportRequested) {
     publishHealthMessage(&client);
     healthReportRequested = false;
   }
-  displayLoop();
-
 }
